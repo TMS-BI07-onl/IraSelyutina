@@ -1,0 +1,79 @@
+Задание 1.
+/*a.	StandardCost равен 0 или не определен – ‘Not for sale’  
+b.	StandardCost больше 0, но меньше 100 – ‘<$100’ 
+c.	StandardCost больше или равно 100, но меньше 500 - ‘ <$500' 
+d.	Иначе - ‘ >= $500'*/
+
+SELECT Name, ListPrice,
+CASE WHEN (ListPrice = 0 OR ListPrice IS NULL) THEN 'Not for sale'
+	     WHEN (ListPrice > 0 and ListPrice < 100) THEN '<$100'
+	     WHEN (ListPrice >= 100 and ListPrice < 500) THEN '<$500'
+	     ELSE '>=$500'
+	END PriceCategory
+FROM AdventureWorks2017.Production.Product
+	
+/*b)	Найти ProductID, BusinessEntityID и имя поставщика продукции из Purchasing.ProductVendor 
+и Purchasing.Vendor, где StandardPrice больше $10. Также в имени вендора должна присутствовать 
+(вне зависимости от положения) буква X или имя должно начинаться на букву N. */
+
+SELECT [name], t1.[BusinessEntityID], t2.StandardPrice, t2.[ProductID] 
+FROM [Purchasing].[Vendor] t1
+	JOIN [Purchasing].[ProductVendor] t2  
+	ON t1.[BusinessEntityID] = t2.[BusinessEntityID]
+WHERE 1=1 AND
+	(NAME LIKE '%x%' OR NAME LIKE 'N%') AND STANDARDPRICE>10
+
+/*c)	Найти имена всех вендоров, продукция которых не продавалась за всё время. 
+Необходимо использовать следующую схему соединения таблиц Purchasing.ProductVendor и Purchasing.Vendor:*/
+SELECT   DISTINCT T1.[name]
+FROM [Purchasing].[Vendor] T1
+LEFT JOIN [Purchasing].[ProductVendor] T2
+ON T1.[BusinessEntityID] = T2.[BusinessEntityID]
+WHERE T2.[ProductID] IS NULL
+
+
+/*a)	Найдите производителей, препараты которых не продавались в 2019 году 
+(подсказка: для выделения года из даты надо использовать одну из функций для работы с датами).*/
+
+SELECT Distinct T1.[Название]
+FROM Фирмы производители AS T1
+lEFT JOIN Фармпрепараты AS T2
+ON T1.[ID]=T2.[ID Фирмы]
+LEFT JOIN Продажи AS T3
+ON T2.[ID]=T3.[ID Фармпрепарата]
+LEFT JOIN (SELECT * FROM Кассовые чеки  WHERE year(Дата)=2019) T4
+ON T4.[ID]=T3.[ID Чека]
+WHERE T4.[Дата] IS NULL
+
+/*b)	Выведите увеличенную в 2 раза цену препаратов типа А. */
+
+
+SELECT T1.[Тип], T2.[Название], T2.[Цена]*2 as ДвойнаяЦена
+FROM Типы Фармпрепаратов as T1 
+JOIN Фармпрепараты as T2
+ON T1.[ID] = T2.[ID типа]
+WHERE T1.[Тип] ='A'
+
+/*c)	Найдите производителей и кол-во фармпрепаратов для кажого из них, где препарат не относится к типу А.*/
+
+SELECT T2.[ID Типа], COUNT(1)
+FROM Фирмы производители AS T1
+JOIN Фармпрепараты AS T2
+ON T1.[ID]=T2.[ID Фирмы]
+JOIN Типы Фармпрепаратов AS T3
+ON T2.[ID Типа]=T3.[ID]
+WHERE T2.[ID Типа]!='A'
+group by T2.[ID Типа]*/
+
+/*d) Вывести название аптеки и названия фармпрепаратов, которые в ней продавались по субботам.*/
+
+SELECT T1.[Название], T4[Название]
+from Аптечные пункты as T1
+JOIN Продажи as T2
+ON T1.[ID]=T2.[АПТЕЧНЫЕ ПУНКТЫ]
+JOIN (select * FROM Кассовые чеки  WHERE DatePart(weekday,Дата)=6)  T3
+ON T2.[ID Чека]=T3.[ID]
+LEFT JOIN Фармпрепараты AS T4
+ON T2.[ID Фармпрепарата=T4.[ID]
+
+
