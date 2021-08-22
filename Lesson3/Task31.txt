@@ -1,0 +1,17 @@
+/*Разложить дату на составляющие стобца LastReceiptDate таблицы Purchasing.ProductVendor (год, месяц, день),
+найти день недели */
+
+Select LastReceiptDate, Year(LastReceiptDate) as Year, Month(LastReceiptDate) as Month,
+Day(LastReceiptDate) as Day, DatePart(weekday,LastReceiptDate)
+FROM AdventureWorks2017.Purchasing.ProductVendor
+
+/*вывести дату, через 30 дней после указанной в стоблце LastReceiptDate и вывести последний день месяца*/
+Select LastReceiptDate, DATEADD(day,30, LastReceiptDate), EOMONTH(LastReceiptDate)
+FROM AdventureWorks2017.Purchasing.ProductVendor
+
+
+/*В таблице HumanResources.Employee вывести поля с удаленными пробелами в Job Title в конце и в начале, 
+вывести маленькими буквами, вывести первые 3 символа, найти количество символов. Если символов>23 dsdtcnb текст - 'too much', 
+посчитать количество строк*/
+SELECT TRIM(JobTitle), Lower(JobTitle) , LEN(JobTitle), IIF (LEN(JobTitle)>=23,'too much', 'Norm') as result, left (JobTitle, 3)
+From HumanResources.Employee
