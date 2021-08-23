@@ -1,0 +1,21 @@
+Well done!
+
+2.
+a)
+Pay attention to required fields in the select list.
+Technically, while writing second and third condition for this task you could leave only <100 and <500, because all conditions is being checked in the written order. It's just for your information. :)
+
+b)
+Pay attention to required fields in the select list.
+
+3.
+a)
+No need to use left join in all connections (except the last).
+
+c) -0.25
+Pay attention to required fields in the select list!!!
+
+Also, general note about joining. 
+Your solutions with joining to select are correct, but they are not optimal. There is no reason to move filtration to the FROM clause. Of course, query perfomance can be changed from table to table and in some cases your solution could be better. But in general we decide to JOIN to the whole table and move filters to WHERE.
+
+Mark: 7+2
