@@ -1,0 +1,111 @@
+Задание 3
+/*При каких значениях оконные функции Row Number, Rank и Dense Rank вернут одинаковый результат?
+Если нет повторяющихся значений в каждой строке в ранжируемой секции, и не надо присваивать например 1 место сразу 2ум строкам,
+ и как следствие, 3ьему значение тоже не присваивается 2/4 */
+
+Задание 4
+
+/*a)	Изучите данные в таблице Production.UnitMeasure. 
+Проверьте, есть ли здесь UnitMeasureCode, начинающиеся на букву ‘Т’. 
+Сколько всего различных кодов здесь есть? */
+
+SELECT Sum(iif(LEFT(UnitMeasureCode,1)='T',1,0)) As '# Starts with T',count(distinct(UnitMeasureCode)) AS '# of unique codes'
+FROM AdventureWorks2017.Production.UnitMeasure
+
+/*Этого не было в задании, но чтобы не убить нечаянно что-нибудь важное,
+я решила вставлять значения в новую базу*/
+
+Select UnitMeasureCode, Name, ModifiedDate
+INTO [dbo].[Test] 
+FROM [Production].[UnitMeasure]
+
+/*Вставьте следующий набор данных в таблицу:
+•	TT1, Test 1, 9 сентября 2020
+•	TT2, Test 2, getdate()*/
+
+INSERT INTO [dbo].[Test] (UnitMeasureCode, Name, ModifiedDate)
+VALUES('TT1','Test 1','2020-09-09')
+
+INSERT INTO [dbo].[Test] (UnitMeasureCode, Name, ModifiedDate)
+VALUES('TT2','Test 2',GETDATE())
+
+/*Проверьте теперь, есть ли здесь UnitMeasureCode, начинающиеся на букву ‘Т’.*/
+SELECT Sum(iif(LEFT(UnitMeasureCode,1)='T',1,0)) As '# Starts with T'
+FROM [dbo].[Test]
+
+/*b)	Теперь загрузите вставленный набор в новую, не существующую таблицу Production.UnitMeasureTest.
+Догрузите сюда информацию из Production.UnitMeasure по UnitMeasureCode = ‘CAN’.  
+Посмотрите результат в отсортированном виде по коду. */
+
+SELECT *
+INTO [Production].[UnitMeasureTest]
+FROM [dbo].[Test]
+
+INSERT INTO [Production].[UnitMeasureTest]
+SELECT *
+FROM AdventureWorks2017.Production.UnitMeasure
+WHERE UnitMeasureCode='CAN'
+
+SELECT *
+FROM [Production].[UnitMeasureTest]
+ORDER BY UnitMeasureCode
+
+/*c)	Измените UnitMeasureCode для всего набора из Production.UnitMeasureTest на ‘TTT’.*/
+
+SELECT Replace(UnitMeasureCode,UnitMeasureCode,'TTT') as UnitMeasureCode , Name, ModifiedDate
+FROM [Production].[UnitMeasureTest]
+
+/*d)	Удалите все строки из Production.UnitMeasureTest.*/
+
+delete [Production].[UnitMeasureTest]
+
+/*e)	Найдите информацию из Sales.SalesOrderDetail по заказам 43659,43664.  
+С помощью оконных функций MAX, MIN, AVG найдем агрегаты по LineTotal для каждого SalesOrderID.*/
+
+SELECT SalesOrderID, LineTotal, 
+AVG([LineTotal]) OVER (PARTITION BY SalesOrderID) as AVG1,
+MAX([LineTotal]) OVER (PARTITION BY SalesOrderID) as MAX1,
+MIN([LineTotal]) OVER (PARTITION BY SalesOrderID) as MIN1
+FROM Sales.SalesOrderDetail
+WHERE SalesOrderID=43659 OR SalesOrderID=43664
+
+/*f)	Изучите данные в объекте Sales.vSalesPerson. Создайте рейтинг cреди продавцов на основе годовых продаж SalesYTD,
+используя ранжирующую оконную функцию. Добавьте поле Login, состоящий из 3 первых букв фамилии в верхнем регистре 
++ ‘login’ + TerritoryGroup (Null заменить на пустое значение). 
+Кто возглавляет рейтинг? А кто возглавлял рейтинг в прошлом году (SalesLastYear). */
+
+SELECT FirstName, MiddleName, LastName, SalesYTD, SalesLastYear,
+Concat(Upper(TRIM(LEFT(LastName,3))),'login',ISNULL(TerritoryGroup,'')) AS Login,
+RANK() OVER (ORDER BY SalesYTD desc) AS "RankThisYear",
+RANK() OVER (ORDER BY SalesLastYear desc) AS "RankLastYear"
+FROM Sales.vSalesPerson
+
+/*Кто возглавляет рейтинг? -Все, кто удовлетворяют условию  WHERE RankThisYear=1
+А кто возглавлял рейтинг в прошлом году (SalesLastYear). - -Все, кто удовлетворяют условию WHERE RankLastYear=1*/
+
+/*g)	Найдите первый будний день месяца (FROM не используем). Нужен стандартный код на все времена.*/
+
+SELECT Getdate(),
+CASE WHEN (Datepart(weekday,DATEFROMPARTS(year(Getdate()),month(Getdate()),1)) = 7) 
+	 THEN DATEFROMPARTS(year(Getdate()),month(Getdate()),3)
+	 WHEN (Datepart(weekday,DATEFROMPARTS(year(Getdate()),month(Getdate()),1)) = 1) 
+	 THEN DATEFROMPARTS(year(Getdate()),month(Getdate()),2)
+	 ELSE DATEFROMPARTS(year(Getdate()),month(Getdate()),1)
+	END FirstWorkingDay
+
+/* Удаляю таблицу, которую сама придумала*/
+
+DROP TABLE [dbo].[Test] ; 
+
+Задание 5
+
+/* Найдите значения count(1), count(name), count(id), count(*) для следующей таблицы:
+Id(PK)	Name		DepName
+1	null		A
+2	null		null
+3	A		C
+4	B		C
+COUNT(*)=COUNT(1)=4
+COUNT(name)=2
+count(id)=4
+*/
