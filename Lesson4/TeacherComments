@@ -1,0 +1,16 @@
+Well done!
+
+4.
+b)
+You can insert multiple rows by having it divided by comma, like this:
+INSERT INTO Production.UnitMeasure
+VALUES 
+('TT1', 'Test1', '2020-09-09'),
+('TT2','Test2',GETDATE())
+
+c)-1
+The task was about updating the data in the table, so you needed to use UPDATE SET.
+UPDATE Production.UnitMeasureTest
+SET UnitMeasureCode='TTT'
+
+Mark:9.
