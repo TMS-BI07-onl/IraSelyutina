@@ -1,0 +1,136 @@
+/*6.	Изучите, что такое ограничения. Какие ограничения есть для таблицы Person.Address? 
+1. Все столбцы  - NOT NULL
+2. PK - AddressID
+   FK - StateProvincedID
+3. Типы данных всех столбцов  */
+
+/*7.	В базе данных AdventureWorks2017 создать таблицу Patients для ведения наблюдений за температурой пациентов больницы. 
+Таблица должна содержать поля:
+ID – числовое поле. Авто заполняется.
+FirstName – имя пациента, может быть пустым.
+LastName – фамилия пациента,  не может быть пустым.
+SSN – уникальный идентификатор пациента (используйте функцию).
+Email – электронная почта пациента. Формируется по следующему правилу:
+большая первая буква FirstName + маленькие 3 буквы LastName + @mail.com (например, Akli@mail.com). 
+Temp – температура пациента, значения не должны превышать 45.
+CreatedDate — дата измерений. 
+*/
+   USE AdventureWorks2017; 
+   CREATE TABLE Patients  
+		(id_num int IDENTITY(1,1),  
+		 FirstName varchar (20),  
+		 LastName varchar (20) CHECK(LastName !=''),
+		 SSN uniqueidentifier NOT NULL DEFAULT newid(),
+		 Email AS CONCAT(UPPER(LEFT(TRIM(FirstName),1)),LOWER(LEFT(TRIM(LastName),3))),
+		 Temp int ,CHECK(Temp >0 AND Temp < 45),
+		 CreatedDate Date); 
+/*Проверяем, что было создано*/
+select *
+from Patients
+
+/*8.	Добавить в таблицу несколько произвольных записей. 
+Убедиться, что ограничения действуют. Посмотрите на ошибки, если вставка противоречит ограничениям.*/
+
+/*Вводим верные данные - вводит*/
+INSERT Patients  
+(FirstName, LastName, Temp, CreatedDate)  
+VALUES  
+ ('W', 'R', 39, '2009-01-03')
+GO
+
+/*Вводим неверный LastName - не вводит*/
+
+INSERT Patients  
+(FirstName, LastName, Temp, CreatedDate)  
+VALUES  
+ ('W1', '', 40, '2009-01-03')
+GO
+
+/*Вводим пробел вместо FirstName - вводит*/
+
+INSERT Patients  
+(FirstName, LastName, Temp, CreatedDate)  
+VALUES  
+ ('', 'w2', 36, '2009-01-03')
+GO
+
+/*Вводим Temp>45 - не вводит*/
+
+INSERT Patients  
+(FirstName, LastName, Temp, CreatedDate)  
+VALUES  
+ ('s2', 'w2', 46, '2009-01-03')
+GO
+
+/* все типы ошибок  - 547
+Поыталась написать триггер, но он работает, только если ошибки нет
+
+CREATE TRIGGER trigger_WorksonIntegrity
+    ON Patients After INSERT, update
+    AS IF Update (id_num)
+    BEGIN
+        IF (@@ERROR = 547)
+        BEGIN
+            ROLLBACK TRANSACTION
+            PRINT @@ERROR /PRINT 'Operation Failed'
+        END
+        ELSE 
+            PRINT 'Operation completed'
+    END
+
+drop trigger trigger_WorksonIntegrity; */
+
+
+/*9.	Добавить поле TempType со следующими значениями ‘< 38°C’,  ‘> =38°C’ на основе значений 
+из поля Temp ( используйте ALTER TABLE ADD column AS ). 
+Посмотрите на данные, которые получились.
+*/
+
+ALTER TABLE Patients
+ADD TempType AS (IIF(Temp<38,'< 38°C','> =38°C'))
+
+SELECT *
+FROM Patients
+
+/*Либо*/
+
+SELECT id_num, FirstName,LastName, SSN, email, Temp, CreatedDate, (IIF(Temp<38,'< 38°C','> =38°C')) AS TempType
+FROM Patients
+
+/*10.	Создать представление Patients_v, показывающее температуру в градусах Фаренгейта
+(°F = °Cx9/5 + 32). Заменять действующее поля не стала, т.к. там стоит ограничение, а Фаренгейт в цифровом значении
+зачастую не будет соответствовать условию*/
+
+
+CREATE VIEW  Patients_v 
+AS   
+SELECT id_num, FirstName, LastName, SSN,Email,Temp, CreatedDate, (TEMP*9/5+32) AS Temp_f, TempType
+FROM Patients
+
+/*если в пред. пункте делать вторым способом - не знает TempType*/
+
+/*11.	Создать функцию, которая возвращает температуру в градусах Фаренгейта, при подаче на вход градусы в Цельсиях.*/
+CREATE FUNCTION Sales.FarTrans (@temp DEC(10,2))
+RETURNS DEC(10,4)
+AS 
+BEGIN
+    RETURN @temp * 1.8+32;
+END;
+
+SELECT Sales.FarTrans (45) Temp_F;
+
+/*12.	Перепишите решение задачи g из прошлого дз с использованием переменной, максимально упрощая select.*/
+
+DECLARE @MyDate int, @m date
+SET @M='2021-05-02';--getdate();
+SET @MyDate = Datepart(weekday,DATEFROMPARTS(year(@M),month(@M),1)) ;
+select 
+case WHEN (@MyDate = 1) then DATEFROMPARTS(year(@m),month(@m),2)
+     WHEN (@MyDate = 7) then DATEFROMPARTS(year(@m),month(@m),3)
+     else DATEFROMPARTS(year(@m),month(@m),1)
+	 END FirstWorkingDay
+
+
+ drop TABLE [dbo].[Patients] ; 
+ drop VIEW [dbo].[Patients_V] ;
+ DROP FUNCTION Sales.FarTrans;
