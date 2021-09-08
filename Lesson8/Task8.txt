@@ -1,0 +1,89 @@
+/*Задание 1
+ повторяется для каждой строки из нашей выборки, что повышает стоимость выполнения запроса
+ Катя, не смогла найти пример синтаксиса использования нескольких Constraint в одном create. 
+ Можешь, пожалуйста, сбросить ссылку на пример?*/
+ 
+ USE AdventureWorks2017; 
+ CREATE TABLE Coach(
+          CoachID int NOT NULL,
+		  FirstName nvarchar(50) Not NULL,
+		  LastName nvarchar(50) Not NULL,
+		  PassportNumber nvarchar(20) NOT NULL,
+		  Rank nvarchar(20),
+		  UNIQUE(PassportNumber),
+		  Constraint PK_Coach_CoachID Primary Key ([CoachID]));  
+
+   CREATE TABLE Swimmer  
+		(SwimmerID int NOT NULL,  
+		CoachID int NOT NULL,
+		FirstName nvarchar(50) Not NULL,
+		LastName nvarchar(50) Not NULL,
+		PassportNumber nvarchar(20) NOT NULL,
+		Birthday date, Cgender nvarchar(1) not null,
+		Rank nvarchar(10),
+		UNIQUE(PassportNumber),
+        Constraint PK_Swimmer_SwimmerID Primary Key ([SwimmerID]),
+		Foreign Key (CoachID) references Coach(CoachID));
+
+CREATE TABLE Location 
+		(LocationID int NOT NULL,  
+		LocationName nvarchar(50) Not NULL,
+		CityName nvarchar(50) Not NULL,
+        Constraint PK_Location_LocationID Primary Key ([LocationID]));
+
+CREATE TABLE Judges 
+		(JudgeID int NOT NULL,  
+		FirstName nvarchar(50) Not NULL,
+		LastName nvarchar(50) Not NULL,
+		PassportNumber nvarchar(20) NOT NULL,
+		SwimStyle nvarchar(30),
+		Rank nvarchar(20),
+		TypesOfOfficial nvarchar(30),
+		UNIQUE(PassportNumber),
+        Constraint PK_Judge_JudgeID Primary Key ([JudgeID]));
+
+CREATE TABLE Competition 
+		(CompetitionID int NOT NULL, 
+		JudgeID int NOT NULL,
+		SwimmerID int Not NULL,
+		LocationID int Not NULL,
+		Date datetime Not NULL,
+		ResultTime time Not NULL,
+        Constraint PK_Competition_CompetitionID Primary Key ([CompetitionID]),
+		Foreign Key (SwimmerID) references Swimmer(SwimmerID),
+		Foreign Key (LocationID) references Location(LocationID),
+		Foreign Key (JudgeID) references Judges(JudgeID));
+
+CREATE TABLE Team
+	(TeamID int NOT NULL,
+	Captain nvarchar(50) NOT NULL,
+	MembersNumber int NOT NULL,
+	Country  nvarchar(30),
+	TeamName  nvarchar(30) NOT NULL,
+	TeamDate date,
+	Constraint PK_Team_TeamID Primary Key ([TeamID]));
+
+CREATE TABLE Bridge_Swimmer_Team
+		(SwimmerID INT NOT NULL,
+		TeamID int NOT NULL,
+		Foreign Key (SwimmerID) references Swimmer(SwimmerID),
+		Foreign Key (TeamID) references Team(TeamID));
+
+/*Задание 2
+Выгружаем 2 таблицы из Mockaroo по 1000 строк с именами и фамилиями, и дальше используем декарт. произведение*/
+ SELECT (Concat(t1.[first_name],'_', t2.[first_name])) AS First_Name, Concat(t1.[Last_name],'_',t2.[Last_name]) AS Last_Name
+FROM [DBO].[MOCK_DATA] t1
+	CROSS JOIN [DBO].[MOCK_DATA1] t2  
+
+/*Перепроверила. Таких записей 1 млн. Т.е. все строчки имя+фамилия уникальны*/
+SELECT distinct(Concat(t1.[first_name], t2.[first_name],t1.[Last_name],t2.[Last_name]))
+FROM [DBO].[MOCK_DATA] t1
+	CROSS JOIN [DBO].[MOCK_DATA1] t2  
+
+/*Задание 3
+
+3.	Познакомьтесь с обобщенным табличным выражением WITH. Когда можем использовать данную структуру?
+В случаях, когда нужно много раз обращаться к одним и тем же таблицам/выборкам из таблиц/для написания рекурсивных запросов/
+для создания представлений (VIEW) в части SELECT/
+Чем отличается от подзапроса?  
+-повторяется для каждой строки из нашей выборки, что повышает стоимость выполнения запроса*/
