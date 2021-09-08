@@ -1,0 +1,12 @@
+Well done!
+
+A
+I don't see the connection field (foreign key) between tables.
+
+C -1
+We need a bridge table to connect two dimensions.
+
+E -0.5
+You're joining on char column, try to avoid it. It's better to add int pk.
+
+Mark: 9.
