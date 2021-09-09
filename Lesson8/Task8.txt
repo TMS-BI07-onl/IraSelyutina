@@ -70,8 +70,9 @@ CREATE TABLE Bridge_Swimmer_Team
 		Foreign Key (TeamID) references Team(TeamID));
 
 /*Задание 2
-Выгружаем 2 таблицы из Mockaroo по 1000 строк с именами и фамилиями, и дальше используем декарт. произведение*/
- SELECT (Concat(t1.[first_name],'_', t2.[first_name])) AS First_Name, Concat(t1.[Last_name],'_',t2.[Last_name]) AS Last_Name
+Выгружаем 2 таблицы из Mockaroo по 1000 строк с именами и фамилиями, и дальше используем декарт. произведение, 
+если котекст позволяет использовать двойные имя/фамилию*/
+ SELECT (Concat(t1.[first_name],'-', t2.[first_name])) AS First_Name, Concat(t1.[Last_name],'-',t2.[Last_name]) AS Last_Name
 FROM [DBO].[MOCK_DATA] t1
 	CROSS JOIN [DBO].[MOCK_DATA1] t2  
 
@@ -79,6 +80,18 @@ FROM [DBO].[MOCK_DATA] t1
 SELECT distinct(Concat(t1.[first_name], t2.[first_name],t1.[Last_name],t2.[Last_name]))
 FROM [DBO].[MOCK_DATA] t1
 	CROSS JOIN [DBO].[MOCK_DATA1] t2  
+
+	
+/*или можно перемножить таблицу саму на себя*/
+ SELECT t1.[first_name] AS First_Name, t2.[Last_name] AS Last_Name
+FROM [DBO].[MOCK_DATA] t1
+	CROSS JOIN [DBO].[MOCK_DATA] t2  
+
+/*Но тогда уникальных 943000, но это потому, что автоматически сформированная таблица из мокару тоже содержала повторения, 
+и мы от них застрахованы не были*/
+SELECT distinct(Concat(t1.[first_name], t2.[Last_name]))
+FROM [DBO].[MOCK_DATA] t1
+	CROSS JOIN [DBO].[MOCK_DATA] t2  
 
 /*Задание 3
 
