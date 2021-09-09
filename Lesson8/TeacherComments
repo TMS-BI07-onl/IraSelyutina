@@ -1,0 +1,17 @@
+Well done!
+
+For example, 
+CREATE TABLE Competition (
+	ID INT CONSTRAINT PK_Competition_Id PRIMARY KEY IDENTITY NOT NULL,
+	SwimmerID INT NOT NULL,
+	LocationID INT NOT NULL,
+	JudgeID INT NOT NULL,
+	ResultTime TIME NOT NULL,
+	StartDate DATETIME NOT NULL,
+	EndDate DATETIME
+	, CONSTRAINT FK_Competition_To_Swimmer FOREIGN KEY (SwimmerId)  REFERENCES Swimmer (Id),
+	CONSTRAINT FK_Competition_To_Location FOREIGN KEY (LocationId)  REFERENCES Locations (Id),
+	CONSTRAINT FK_Competition_To_Judge FOREIGN KEY (JudgeId)  REFERENCES Judge (Id)
+)
+
+Mark: 10.
