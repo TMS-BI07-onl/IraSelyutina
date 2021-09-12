@@ -1,0 +1,208 @@
+/*Coach*/
+ CREATE TABLE Coach(
+          CoachID int CONSTRAINT PK_CoachID_Id PRIMARY KEY IDENTITY NOT NULL,
+		  FirstName nvarchar(50) Not NULL,
+		  LastName nvarchar(50) Not NULL,
+		  PassportNumber nvarchar(20) NOT NULL,
+		  Rank nvarchar(3),
+		  CONSTRAINT AK_Coach_PassportNumber UNIQUE(PassportNumber));  
+
+ALTER TABLE Coach_data ALTER COLUMN CoachID INT NOT NULL
+ALTER TABLE Coach_data ALTER COLUMN PassportNumber nvarchar(20) NOT NULL
+ALTER TABLE Coach_data ALTER COLUMN Rank nvarchar(3) NOT NULL
+
+UPDATE Coach_data
+SET Rank = CASE WHEN rank in (0,1,2,9) THEN N'CMS'
+		        WHEN rank in (3,4,5) THEN N'MS'
+		        WHEN rank in (6,7,8) THEN N'WMS' end
+
+INSERT INTO Coach (FirstName, LastName , PassportNumber, Rank) 
+SELECT First_Name, Last_Name , PassportNumber, Rank 
+FROM Coach_data
+
+select *
+from coach
+
+/*Location*/
+
+CREATE TABLE Location 
+		(LocationID int CONSTRAINT PK_Location_LocationID PRIMARY KEY IDENTITY NOT NULL,  
+		LocationName nvarchar(50) Not NULL,
+		CityName nvarchar(50) Not NULL);
+
+ALTER TABLE Location_data ALTER COLUMN Location_ID INT NOT NULL
+
+INSERT INTO Location (LocationName , CityName) 
+SELECT Location_Name, City_Name 
+FROM Location_data
+
+select *
+from Location
+
+/*Judges*/
+
+/*PassportNumber in mockaroo #######^###^^#*
+types of official (7) Referee, Starter, Clerk of course, Timekeepers, Inspector of turns, Judges of stroke,Finish judges
+У нас будет всего 5 стилей: Front Crawl, Breaststroke, Butterfly Stroke,  Backstroke, Sidestroke. 
+Ранк для судей: MS, WMS.*/
+
+
+CREATE TABLE Judges 
+		(JudgeID int CONSTRAINT PK_Judge_JudgeID PRIMARY KEY IDENTITY NOT NULL,  
+		FirstName nvarchar(50) Not NULL,
+		LastName nvarchar(50) Not NULL,
+		PassportNumber nvarchar(20) NOT NULL,
+		SwimStyle nvarchar(30),
+		Rank nvarchar(3),
+		TypesOfOfficial nvarchar(30),
+        CONSTRAINT AK_Judges_PassportNumber UNIQUE(PassportNumber));
+
+ALTER TABLE Judges_data ALTER COLUMN JudgeID INT NOT NULL
+ALTER TABLE Judges_data ALTER COLUMN PassportNumber nvarchar(20) NOT NULL
+ALTER TABLE Judges_data ALTER COLUMN Rank nvarchar(3) NOT NULL
+ALTER TABLE Judges_data ALTER COLUMN TypesOfOfficial nvarchar(30) NOT NULL
+ALTER TABLE Judges_data ALTER COLUMN SwimStyle nvarchar(30) NOT NULL
+
+UPDATE Judges_data
+SET Rank = CASE WHEN rank in (0,1,2,3,4) THEN N'MS'
+		        WHEN rank in (5,6,7,8,9) THEN N'WMS' end
+				
+UPDATE Judges_data
+SET TypesOfOfficial = CASE WHEN TypesOfOfficial in (0,8) THEN N'referee'
+						   WHEN TypesOfOfficial in (1,9) THEN N'Starter'
+						   WHEN TypesOfOfficial in (2,7) THEN N'Clerk of course'
+						   WHEN TypesOfOfficial =3 THEN N'Timekeepers'
+						   WHEN TypesOfOfficial =4 THEN N'Inspector of turns'
+						   WHEN TypesOfOfficial =5 THEN N'Judges of stroke'
+						   WHEN TypesOfOfficial =6 THEN N'Finish judges'
+				      end
+
+UPDATE Judges_data
+SET SwimStyle = CASE WHEN SwimStyle in (0,5) THEN N'Front Crawl'
+						   WHEN SwimStyle in (1,6) THEN N'Breaststroke'
+						   WHEN SwimStyle in (2,7) THEN N'Butterfly Stroke'
+						   WHEN SwimStyle in (3,8) THEN N'Backstroke'
+						   WHEN SwimStyle in (4,9) THEN N'Sidestroke'
+				      end
+
+INSERT INTO Judges (FirstName, LastName, PassportNumber, SwimStyle, Rank, TypesOfOfficial) 
+SELECT First_Name, Last_Name , PassportNumber, SwimStyle, Rank, TypesOfOfficial
+FROM Judges_data
+
+
+select *
+from Judges
+
+/*Team*/
+CREATE TABLE Team
+	(TeamID int CONSTRAINT PK_Team_TeamID PRIMARY KEY IDENTITY NOT NULL,
+	Captain nvarchar(50) NOT NULL,
+	MembersNumber int NOT NULL,
+	Country  nvarchar(30),
+	TeamName  nvarchar(30) NOT NULL,
+	TeamAge date);
+
+ALTER TABLE Team_data ALTER COLUMN TeamID INT NOT NULL
+ALTER TABLE Team_data ALTER COLUMN Country nvarchar(30) NOT NULL
+ALTER TABLE Team_data ALTER COLUMN TeamName nvarchar(30) NOT NULL
+ALTER TABLE Team_data ALTER COLUMN TeamAge date NOT NULL
+ALTER TABLE Team_data ALTER COLUMN MembersNumber int NOT NULL
+
+UPDATE Team_data
+SET MembersNumber = CASE WHEN (MembersNumber<=10 ) THEN 10
+				     WHEN MembersNumber>30 THEN 30
+					 else MembersNumber
+				     end
+
+INSERT INTO Team (Captain, MembersNumber, Country, TeamName, TeamAge) 
+SELECT Captain, MembersNumber , Country, TeamName, TeamAge
+FROM team_data
+
+select *
+from team
+
+/*Swimmer
+Ранк для пловцов: U1, U2, U3, 1, 2, 3, CMS, MS.*/
+
+ CREATE TABLE Swimmer  
+		(SwimmerID int CONSTRAINT PK_Swimmer_SwimmerID PRIMARY KEY IDENTITY NOT NULL,  
+		CoachID int NOT NULL,
+		FirstName nvarchar(50) Not NULL,
+		LastName nvarchar(50) Not NULL,
+		PassportNumber nvarchar(20) NOT NULL,
+		Birthday date, Gender nvarchar(1) not null,
+		Rank nvarchar(3),
+		--UNIQUE(PassportNumber),
+		Constraint FK_Swimmer_SwimmerID Foreign Key (CoachID) references Coach(CoachID),
+		CONSTRAINT AK_Swimmer_PassportNumber UNIQUE(PassportNumber));
+
+ALTER TABLE Swimmer_data ALTER COLUMN SwimmerID INT NOT NULL
+ALTER TABLE Swimmer_data ALTER COLUMN PassportNumber nvarchar(20) NOT NULL
+ALTER TABLE Swimmer_data ALTER COLUMN Rank nvarchar(3) NOT NULL
+ALTER TABLE Swimmer_data ALTER COLUMN Gender nvarchar(1) NOT NULL
+ALTER TABLE Swimmer_data ALTER COLUMN Birthday date NOT NULL
+ALTER TABLE Swimmer_data ALTER COLUMN CoachID INT NOT NULL
+
+UPDATE Swimmer_data
+SET Rank = CASE WHEN rank in (0,8) THEN N'U1'
+		        WHEN rank in (1,9) THEN N'U2'
+				When rank=2 THEN N'U3'
+				When rank=3 THEN N'1'
+				When rank=4 THEN N'2'
+				When rank=5 THEN N'3'
+		        WHEN rank=6 THEN N'CMS' 
+				WHEN rank=7 THEN N'MS'end
+UPDATE Swimmer_data
+SET Gender = CASE WHEN Gender in (0,2,4,6,8) THEN N'F'
+		        WHEN Gender in (1,3,5,7,9) THEN N'M'
+				end
+
+INSERT INTO Swimmer_data (SwimmerID, FirstName, LastName, PassportNumber, Birthday, Gender, Rank, CoachID) 
+SELECT T1.[swimmerID], T1.[FirstName], T1.[LastName], T1.[PassportNumber], T1.[Birthday],T1.[Gender], T1.[Rank], T2.[CoachID]
+FROM team_data
+
+
+INSERT INTO Swimmer (FirstName, LastName, PassportNumber, Birthday, Gender, Rank, CoachID)
+SELECT T1.[FirstName], T2.[LastName], Concat(Left(t1.[PassportNumber],7),right(t2.[PassportNumber],7)),
+T1.[Birthday],T2.[Gender], T1.[Rank], T2.[CoachID]
+FROM [DBO].[Swimmer_Data] t1
+CROSS JOIN [DBO].[Swimmer_Data] t2 
+
+/*COMPETITION*/
+CREATE TABLE Competition 
+        (CompetitionID int CONSTRAINT PK_Competition_CompetitionID PRIMARY KEY IDENTITY NOT NULL, 
+		JudgeID int NOT NULL,
+		SwimmerID int Not NULL,
+		LocationID int Not NULL,
+		Date datetime Not NULL,
+		ResultTime time Not NULL,
+		Constraint FK_Competition_SwimmerID Foreign Key (SwimmerID) references Swimmer(SwimmerID),
+		Constraint FK_Competition_LocationID Foreign Key (LocationID) references Location(LocationID),
+		Constraint FK_Competition_JudgeID Foreign Key (JudgeID) references Judges(JudgeID));
+
+ALTER TABLE Competition_data ALTER COLUMN CompetitionID INT NOT NULL
+ALTER TABLE Competition_data ALTER COLUMN JudgeID INT NOT NULL
+ALTER TABLE Competition_data ALTER COLUMN SwimmerID INT NOT NULL
+ALTER TABLE Competition_data ALTER COLUMN ResultTime TIME NOT NULL
+
+INSERT INTO Competition (JudgeID, SwimmerID, LocationID, Date, ResultTime) 
+SELECT JudgeID, SwimmerID, LocationID, Date, ResultTime
+FROM Competition
+
+/*2.	Решите следующую задачу. 
+Дана таблица людей People. Поля: ID, FirstName, ParentName, LastName,  ID_Father, ID_Mother.
+Для всех Дмитриев выведите их ФИО и ФИО их отцов.
+*/
+CREATE TABLE Son_Farther (ID, FirstName, ParentName, LastName, ID_Farther)
+
+insert into Farther(ID, FirstName, ParentName, LastName, ID_Farther)
+SELECT ID, FirstName, ParentName, LastName, ID_Farther
+FROM PEOPLE
+WHERE FirstName='Дмитрий'
+
+SELECT T1.[FirstName] AS FirstName, T1.[ParentName] AS ParentName, T1.[LastName] AS LastName,
+T2.[FirstName] AS FirstName_Farther, T2.[ParentName] AS ParentName_Farther, T2.[LastName] AS LastName_Farther 
+FROM [Farther] T1
+	LEFT JOIN PEOPLE T2 
+	ON T1.[ID_FARTHER] = T2.[ID]
+
