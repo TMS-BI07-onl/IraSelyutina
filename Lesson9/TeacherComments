@@ -1,0 +1,9 @@
+Well done!
+
+There is no need to add not null constraint to primary key. PK is already not null.
+I’m not getting the point, you created table Coach, but altering Coach_data. If Coach_data is source data table, there is no need to add constraints there.
+
+-3
+There is only one table - People.
+
+Mark: 7
