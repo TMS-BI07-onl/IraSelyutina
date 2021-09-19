@@ -1,0 +1,83 @@
+CREATE TABLE func_count
+(Function_name nvarchar(50),
+Function_count int)
+
+/*1*/
+MERGE [dbo].[func_count] target
+USING [dbo].[data_for_merge] source ON target.[Function_name]=source.[IrinaPashkovich]
+WHEN MATCHED AND source.[IrinaPashkovich] IS NOT NULL THEN UPDATE SET target.[Function_count] = target.[Function_count]+1  
+
+WHEN NOT MATCHED   BY TARGET AND source.[IrinaPashkovich] IS NOT NULL
+	THEN INSERT ([Function_name], [Function_count])
+	VALUES (source.[IrinaPashkovich],1);
+/*2*/
+
+MERGE [dbo].[func_count] target
+USING [dbo].[data_for_merge] source ON target.[Function_name]=source.[Darya]
+WHEN MATCHED AND source.[Darya]IS NOT NULL THEN UPDATE SET target.[Function_count] = target.[Function_count]+1  
+
+WHEN NOT MATCHED   BY TARGET AND source.[Darya] IS NOT NULL
+	THEN INSERT ([Function_name], [Function_count])
+	VALUES (source.[Darya],1);
+
+/*3*/
+MERGE [dbo].[func_count] target
+USING [dbo].[data_for_merge] source ON target.[Function_name]=source.[Ekaterina]
+WHEN MATCHED AND source.[Ekaterina] IS NOT NULL THEN UPDATE SET target.[Function_count] = target.[Function_count]+1  
+
+WHEN NOT MATCHED   BY TARGET AND source.[Ekaterina]IS NOT NULL
+	THEN INSERT ([Function_name], [Function_count])
+	VALUES (source.[Ekaterina],1);
+
+/*4*/
+MERGE [dbo].[func_count] target
+USING [dbo].[data_for_merge] source ON target.[Function_name]=source.[IrinaSelyutina]
+WHEN MATCHED AND source.[IrinaSelyutina] IS NOT NULL THEN UPDATE SET target.[Function_count] = target.[Function_count]+1  
+
+WHEN NOT MATCHED   BY TARGET AND source.[IrinaSelyutina] IS NOT NULL
+	THEN INSERT ([Function_name], [Function_count])
+	VALUES (source.[IrinaSelyutina],1);
+
+/*5*/
+MERGE [dbo].[func_count] target
+USING [dbo].[data_for_merge] source ON target.[Function_name]=source.[Viktor]
+WHEN MATCHED AND source.[Viktor] IS NOT NULL THEN UPDATE SET target.[Function_count] = target.[Function_count]+1  
+
+WHEN NOT MATCHED   BY TARGET AND source.[Viktor] IS NOT NULL
+	THEN INSERT ([Function_name], [Function_count])
+	VALUES (source.[Viktor],1);
+/*6*/
+MERGE [dbo].[func_count] target
+USING [dbo].[data_for_merge] source ON target.[Function_name]=source.[Dmitriy]
+WHEN MATCHED AND source.[Dmitriy] IS NOT NULL THEN UPDATE SET target.[Function_count] = target.[Function_count]+1  
+
+WHEN NOT MATCHED   BY TARGET AND source.[Dmitriy] IS NOT NULL
+	THEN INSERT ([Function_name], [Function_count])
+	VALUES (source.[Dmitriy],1);
+/*7*/
+MERGE [dbo].[func_count] target
+USING [dbo].[data_for_merge] source ON target.[Function_name]=source.[Svetlana]
+WHEN MATCHED AND source.[Svetlana] IS NOT NULL THEN UPDATE SET target.[Function_count] = target.[Function_count]+1  
+
+WHEN NOT MATCHED   BY TARGET AND source.[Svetlana] IS NOT NULL
+	THEN INSERT ([Function_name], [Function_count])
+	VALUES (source.[Svetlana],1);
+/*8*/
+MERGE [dbo].[func_count] target
+USING [dbo].[data_for_merge] source ON target.[Function_name]=source.[VikaVoronchuk]
+WHEN MATCHED AND source.[VikaVoronchuk] IS NOT NULL THEN UPDATE SET target.[Function_count] = target.[Function_count]+1  
+
+WHEN NOT MATCHED   BY TARGET AND source.[VikaVoronchuk] IS NOT NULL
+	THEN INSERT ([Function_name], [Function_count])
+	VALUES (source.[VikaVoronchuk],1);
+
+/*9*/
+MERGE [dbo].[func_count] target
+USING [dbo].[data_for_merge] source ON target.[Function_name]=source.[VikaOstopchuk]
+WHEN MATCHED AND source.[VikaOstopchuk] IS NOT NULL THEN UPDATE SET target.[Function_count] = target.[Function_count]+1  
+
+WHEN NOT MATCHED   BY TARGET AND source.[VikaOstopchuk] IS NOT NULL
+	THEN INSERT ([Function_name], [Function_count])
+	VALUES (source.[VikaOstopchuk],1);
+select *
+from func_count

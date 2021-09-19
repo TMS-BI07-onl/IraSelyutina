@@ -1,0 +1,30 @@
+/*Найти среднюю сумму трат клиентов с каждым размером скидки (скидку сгруппировать по 0-10, 10-30, 30+)
+(например, клиент со скидкой до 10 процентов тратит 100р, а со скидкой до 30 - 500р, т.е. скидки побуждают тратить больше)*/
+Alter table DISCOUNT add column Сategory=(case when ((Size>=0 and Size<=10) or Size is null) then '0-10'
+          when Size>10 and Size<=30 then '10-30'
+		 else '>30')
+
+SELECT P1.[IDGuest], P1.[FirstName], P1.[LastName],p2.[Сategory],p3.[payment],
+AVG (p3.[payment]) OVER(PARTITION BY p2.[Сategory]) AS AVG_PAYMENT
+FROM GUEST P1
+lEFT JOIN DISCOUNT P2 -- Left join чтобы не удалить новых клиентов без скидки
+ON P1.[IDGuest]=P2.[IDGuest]
+join payment p3
+on P1.[IDGuest]=P3.[IDGuest]
+
+/*Найти среднюю выручку (сумма продаж/кол-во комнат) для разных типов комнат по годам.
+Вывести в виде транспонированной таблицы.
+ROOMS (IDRoom, IDTypeofRoom , Price, IDEmployee)
+PAYMENT (IDPayment , StatusOfPayment, IDGuest )
+BOOKING (IDGuest, StartDateofBooking, LastDateofBooking , IDRoom )*/
+
+SELECT DATENAME(year,p1.[StartDateofBooking]),p3.[IDTypeofRoom], p2.[PAYMENT]
+FROM (SELECT DATENAME(year,[StartDateofBooking]) as year, [IDTypeofRoom] 
+FROM FROM BOOKING  P1
+join PAYMENT p2
+on p1.[IDGuest]=p2.[IDGuest]
+join ROOMS p3
+on p1.[IDRoom]=p3.[IDRoom]) AS SourceTable 
+PIVOT
+(SUM ([PAYMENT])/count([PAYMENT])  FOR [IDTypeofRoom]) AS PivotTable
+order by year
