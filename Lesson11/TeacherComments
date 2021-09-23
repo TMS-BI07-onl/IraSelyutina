@@ -1,0 +1,18 @@
+Well done!
+
+Homework
+Your answer is correct, great job!
+
+Test
+1
+-0.5
+It was totally not needed to create a new column for discount group.
+
+2
+-1
+It would be better to join also to room_types to have text category, not id.
+What is your main select about? For pivot tables we should list year as a first column and then all values for room types, no payments at all.
+Also, you didn't list values for room types in pivot (...), but I think the reason of this was just not-knowing the values.
+
+Mark: 10
+Test: 9
