@@ -1,0 +1,35 @@
+/*1.	Написать запрос на добавление в таблицу manufacturer нового производителя HP из Америки.*/
+
+INSERT INTO [dbo].[manufacturer] (name, CountryID)
+VALUES ('HP', 'Америки')
+
+
+/*2.	Написать запрос, благодаря которому возраст пользователя Андрей в таблице user уменьшится в 3 раза.*/
+SELECT ID, NAME, EMAIL, Age
+FROM USER
+iif (Name='АНДРЕЙ',UPDATE user set Age=Age/3,Age)
+
+/*3.	Найти название продукта с максимальной ценой.*/
+
+SELECT	Name
+FROM
+(SELECT Name,
+		RANK() OVER (ORDER BY Price DESC) rank
+FROM Product) t
+WHERE rank=1
+
+/*4.	Написать запрос на выборку всех пользователей с телефонами, 
+начинающимися на 3 и заканчивающимися на 4, либо с возрастом > 35.*/
+
+
+SELECT p.Name, c.Name class
+FROM User  p
+		JOIN Pnone c ON p.id=c.user_id
+where c.name like '3%4' or Age>35
+
+/*5.	Найти топ 5 пользователей, кто купил больше всего продуктов.*/
+SELECT id , count (*) AS  
+FROM (SELECT User_id,
+		row_number() OVER (ORDER BY User_id DESC) row_number
+FROM Product) t
+WHERE row_number between 1 and 5
