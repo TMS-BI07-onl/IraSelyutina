@@ -1,0 +1,24 @@
+/*1.	Для своей базы данных создайте объект для нахождения общего рейтинга топ 50 тренеров за всю историю соревнований,
+ где рейтинг определяется общим количеством баллов за победы пловцов 
+(1 место – 3 балла, 2 место – 2 балла, 3 место – 1 балл). */
+
+SELECT DISTINCT TOP 50 WITH TrainerID, SUM(Trainer_score) 
+FROM (SELECT FirstName, LastName, TrainerID, 
+Trainer_score = CASE WHEN PLACE=1 THEN COUNT(TrainerID) *3
+                     WHEN PLACE=2 THEN COUNT(TrainerID) *2
+                     WHEN PLACE=3 THEN COUNT(TrainerID) *1
+                     ELSE  0
+                     END
+FROM (SELECT t2.SwimmerID, t2.TrainerID, t1.FirstName, t1.LastName, DENSE_RANK() OVER(PARTITION BY LastName ORDER BY ResultTime) AS [PLACE]
+FROM Trainer t1 LEFT JOIN Swimmer t2 ON t1.TrainerID = t2.TrainerID
+JOIN Competition t3 ON t2.SwimmerID = t3.SwimmerID)
+GROUP BY TrainerID) 
+
+/*2*/
+a)не нужна легенда; на графиках, на мой взгляд лишнии обеъм/контур.
+b)не совсем понятно, зачем 3яя ось, почему график обьемный, конус визуально не очень считывается.
+Возможно не стоит дублировать значения на графиках (можно заменить на долю,%)
+с)Не сосвсем понятно, чем отличаются 3 графика (совсем непонятно). 
+Возможно подписи не стоит располагать вертикально.
+т.к. все значения около 5 тыс, возможно стоит изменить масштаб оси ординат, чтобы подчеркнуть различия между 3 графиками
+и упростить подпись шапку (много инфрормации, не считывается)
