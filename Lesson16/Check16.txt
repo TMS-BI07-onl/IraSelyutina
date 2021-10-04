@@ -1,0 +1,52 @@
+/*1. Найти ProductSubcategoryID из Production.Product, 
+где мин вес такого ProductSubcategoryID больше 150. */
+select ProductSubcategoryID, weight
+from Production.Product
+where (select MIN(weight) OVER(PARTITION BY ProductSubcategoryID) AS MW from Production.Product)
+group by ProductSubcategoryID
+
+/*2. Найти самый дорогой продукт (поле StandardCost) из Production.Product. (4 способа)*/
+SELECT name, price as max_price
+FROM Production.Product 
+WHERE price=(SELECT MAX(StandardCost) FROM Production.Product)
+/*через rank еще можно*/
+/*3. Найти заплывы, для которых не указан бассейн.*/
+
+
+SELECT p.CompetitionID
+FROM COMPETITION AS p
+	LEFT JOIN lOCATION AS t
+	ON p.Locationid = t.Locationid
+WHERE t.LocationNAme IS NULL
+
+/*4. Найти для каждого судьи кол-во проведенных судейств за последние 15 лет.  (схема GROUP1)*/
+SELECT FirstName, LastName, count(CompetitionID)
+FROM Judge
+WHERE JudgeID NOT IN 
+(
+	SELECT JudgeID
+	FROM Bridge_Judge_Competition jc 
+		join Competition c on jc.CompetitionID=c.CompetitionID
+	WHERE YEAR(Date) BETWEEN YEAR(GETDATE())-15 AND YEAR(GETDATE())
+)
+group by LastName 
+
+/*Users (
+    id bigint NOT NULL,
+    email varchar(255) NOT NULL
+);
+
+Notifications (
+    id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    category varchar(100),
+    is_read boolean DEFAULT false
+);
+
+Найти список категорий для пользователя alex@gmail.com, в которых более 50 непрочитанных нотификаций*/
+select category
+from notifications
+where (select  count(is_read) OVER(PARTITION BY category) from users as t
+join Notifications as p
+on p.user_id=t.id
+where t.email='alex@gmail.com' and is_read='False'
