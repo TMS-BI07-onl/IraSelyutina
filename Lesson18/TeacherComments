@@ -1,0 +1,18 @@
+Well done!
+
+1. -1
+You should have specified the join conditions. In your solution you have cross join.
+Also it's important to add the table name for employee_id.
+Having Count is ... ?
+
+2. -1.5
+No solution.
+
+3. -0.5
+This code won't work. In your solution you need ti order by new name of count column. Just count by itself won't work, 'cause you don't have employee_id column.
+Actually, the better solution will be to have all in one query.
+
+5. -0.5
+We have end_date.
+
+Mark: 7
